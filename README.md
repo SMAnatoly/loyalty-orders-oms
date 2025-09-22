@@ -2,7 +2,7 @@
 
 This repository contains an Apache NiFi flow (LoyaltyOrders.json) designed to automate order and payment confirmation processes for a loyalty program system. The flow interacts with various internal and external APIs to manage order statuses, confirm payments, update loyalty points, and communicate with customers.
 
-📋 Overview
+## 📋 Overview
 The NiFi flow is structured into three main process groups, each handling a distinct part of the loyalty order lifecycle:
 
 LoyaltyOrders-PaymentService/code-verify: Handles the verification of payment confirmation codes.
@@ -13,11 +13,11 @@ burn-bonuses: Processes successful payments, updates order statuses, burns loyal
 
 The flow integrates with internal services (e.g., http://10.160.20.73:8089) and external loyalty platforms.
 
-🏗️ Architecture & Process Groups
-1. LoyaltyOrders-PaymentService/code-verify
+## 🏗️ Architecture & Process Groups
+### 1. LoyaltyOrders-PaymentService/code-verify
 This group polls for new payment confirmations, checks if a code has been entered, validates it, and updates the status of the order and payment accordingly.
 
-Key Processors:
+### Key Processors:
 
 /async/confirm/list-new (InvokeHTTP): Fetches a list of new confirmations awaiting action.
 
@@ -35,10 +35,10 @@ UpdateAttribute: Dynamically calculates the confirmation status (confirmation_ve
 
 /api/order/update (InvokeHTTP): Updates the final order status.
 
-2. set-expired
+### 2. set-expired
 This group periodically checks for sent confirmations that have passed their expiration time and marks them as expired.
 
-Key Processors:
+## Key Processors:
 
 InvokeHTTP (GET): Calls /api/payment/async/confirm/list-new to find confirmations with confirmation_send status.
 
@@ -51,7 +51,7 @@ InvokeHTTP (POST): Calls /api/payment/async/confirm/update to report the expired
 3. burn-bonuses
 This is the most complex group, handling the post-payment process: burning loyalty points, updating multiple statuses, adding tags to customer profiles, and sending SMS notifications.
 
-Key Processors:
+## Key Processors:
 
 /api/payment/list-new (InvokeHTTP): Fetches payments with a confirmation_verified status.
 
@@ -73,7 +73,7 @@ UpdateAttribute & ReplaceText: Prepares payloads for status updates and notifica
 
 send/sms-code (InvokeHTTP): Sends an SMS confirmation to the customer.
 
-⚙️ Configuration
+## ⚙️ Configuration
 Environment Variables / Parameters
 The flow uses Expression Language for configuration. Key attributes to configure (likely via Parameter Contexts in NiFi):
 
@@ -88,7 +88,7 @@ store_department_id: The department ID for the SailPlay API calls.
 Controller Services
 The flow does not currently define any Controller Services (like SSLContextService). These would need to be created and linked if connecting to HTTPS endpoints requiring custom SSL configuration.
 
-🚀 Deployment
+## 🚀 Deployment
 Import Template: Import the LoyaltyOrders.json file into your NiFi instance as a template or by dragging the JSON onto the canvas.
 
 Configure Parameters: Create a Parameter Context defining the variables mentioned above (host, port, sp_token, store_department_id) and link it to the root process group.
@@ -97,14 +97,14 @@ Configure Controller Services: If needed, create and enable any necessary Contro
 
 Start Processors: Enable the GenerateFlowFile processors (or their parent process groups) to begin the scheduled execution.
 
-🔧 Monitoring
+## 🔧 Monitoring
 Use the NiFi UI to monitor the status of connections (queue sizes), processors, and view bulletins.
 
 Key connections have Back Pressure set to 10000 objects or 1 GB to prevent memory overload.
 
 Processors are configured with appropriate penaltyDuration and yieldDuration.
 
-📝 Notes
+## 📝 Notes
 Scheduling: The GenerateFlowFile components are set to run every 5 sec to trigger the polling process. Adjust this based on your performance and business requirements.
 
 Error Handling: The flow primarily uses relationship-based routing (e.g., Failure, Retry). The Retry mechanism is configured on processors (retryCount=10, backoffMechanism="PENALIZE_FLOWFILE"). Ensure failure relationships are connected to appropriate handling logic (e.g., notifying operators, retrying later).
@@ -113,7 +113,7 @@ Sensitive Data: Passwords in processors (e.g., in InvokeHTTP) are not shown in t
 
 Time Zones: The flow uses Europe/Moscow timezone for date conversions. Ensure your NiFi instance's timezone is configured correctly or adjust these expressions.
 
-🧩 Dependencies
+## 🧩 Dependencies
 Apache NiFi 2.3.0+ (or compatible version)
 
 Internal Order/Payment API: Access to the REST API running on the configured host and port.
