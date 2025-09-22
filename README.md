@@ -1,4 +1,4 @@
-oyalty Orders Processing Flow
+Loyalty Orders Processing Flow
 This repository contains an Apache NiFi flow (LoyaltyOrders.json) designed to automate order and payment confirmation processes for a loyalty program system. The flow interacts with various internal and external APIs to manage order statuses, confirm payments, update loyalty points, and communicate with customers.
 
 📋 Overview
